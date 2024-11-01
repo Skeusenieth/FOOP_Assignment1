@@ -2,7 +2,6 @@ package reflection.gson;
 
 import com.google.gson.Gson;
 
-
 public class HelloGson {
     static Gson gson = new Gson();
 
@@ -13,7 +12,7 @@ public class HelloGson {
         boolean isCurrent;
         String email;
 
-        // make a constructor that takes all the fields
+        // Constructor that takes all the fields
         public PersonClass(String firstNames, String lastName, int personId, boolean isCurrent, String email) {
             this.firstNames = firstNames;
             this.lastName = lastName;
@@ -28,8 +27,8 @@ public class HelloGson {
     }
 
     public static PersonClass fromJsonString(String json) {
-        // todo: return a PersonClass object from the json string
-        return null;
+        // Deserialize JSON string back into PersonClass object
+        return gson.fromJson(json, PersonClass.class);
     }
 
     public static void main(String[] args) {
@@ -40,9 +39,18 @@ public class HelloGson {
                 true,
                 "simon.lucas@qmul.ac.uk"
         );
+
+        // Convert to JSON
         String json = toJsonString(simon);
-        System.out.println(json);
+        System.out.println("Serialized JSON: " + json);
+
+        // Deserialize back to PersonClass
         PersonClass simonCopy = fromJsonString(json);
-        System.out.println(simonCopy.firstNames);
+        System.out.println("Deserialized Object:");
+        System.out.println("First Names: " + simonCopy.firstNames);
+        System.out.println("Last Name: " + simonCopy.lastName);
+        System.out.println("Person ID: " + simonCopy.personId);
+        System.out.println("Is Current: " + simonCopy.isCurrent);
+        System.out.println("Email: " + simonCopy.email);
     }
 }

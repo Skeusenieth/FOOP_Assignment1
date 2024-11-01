@@ -10,10 +10,10 @@ public class UMLLayout {
 
     private final double classWidth = 150.0;
     private final double heightFac = 30.0;
-    private final double verticalSpacing = 50.0;
-    private final double horizontalSpacing = 50.0;
+    private final double verticalSpacing = 70.0; // Increased vertical spacing
+    private final double horizontalSpacing = 70.0; // Increased horizontal spacing for better spacing
 
-    // Method to calculate the layout
+    // Method to calculate the layout of each class
     public Map<String, ClassLayout> calculateLayout(DiagramData diagram) {
         Map<String, ClassLayout> layout = new HashMap<>();
         List<String> topologicalSortedClasses = topologicalSort(diagram);
@@ -21,21 +21,30 @@ public class UMLLayout {
         Map<String, List<String>> childrenMap = buildChildrenMap(diagram);
         Map<String, Integer> depthMap = calculateDepths(topologicalSortedClasses, diagram);
 
-        // Assign positions for each class based on its hierarchy level
+        // Track the x position for each depth level to space out classes horizontally
         Map<Integer, Double> nextXPositionForDepth = new HashMap<>();
         Map<String, ClassData> classDataMap = new HashMap<>();
+
         for (ClassData classData : diagram.classes()) {
             classDataMap.put(classData.className(), classData);
         }
 
+        // Assign positions for each class based on its hierarchy level and content
         for (String className : topologicalSortedClasses) {
             int depth = depthMap.get(className);
             double x = nextXPositionForDepth.getOrDefault(depth, 0.0) + horizontalSpacing;
             double y = depth * (verticalSpacing + heightFac);
+
             ClassData classData = classDataMap.get(className);
-            double height = heightFac * (1 + classData.fields().size() + classData.methods().size());
+            int numberOfFields = classData.fields().size();
+            int numberOfMethods = classData.methods().size();
+
+            // Calculate height based on number of fields and methods with additional padding for large content
+            double height = heightFac + (numberOfFields + numberOfMethods) * 18 + 50; // Adjusted values
+
             layout.put(classData.className(), new ClassLayout(x + classWidth / 2, y + height / 2, classWidth, height));
 
+            // Update x position for the next class at this depth level
             nextXPositionForDepth.put(depth, x + classWidth + horizontalSpacing);
         }
 
@@ -118,25 +127,5 @@ public class UMLLayout {
         }
 
         return depthMap;
-    }
-
-    public static void main(String[] args) {
-        // Create a list of classes to generate UML for
-        List<Class<?>> classes = new ArrayList<>();
-        // add in all the classes we wish to generate UML for
-        classes.add(MyShape.class);
-        classes.add(MyCircle.class);
-        classes.add(MyCircle.InnerStatic.class);
-        classes.add(MyEllipse.class);
-        classes.add(Connector.class);
-        System.out.println(classes);
-        System.out.println();
-        DiagramData dd = new ProcessClasses().process(classes);
-
-        UMLLayout umlLayout = new UMLLayout();
-        Map<String, ClassLayout> layout = umlLayout.calculateLayout(dd);
-        for (Map.Entry<String, ClassLayout> entry : layout.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
     }
 }

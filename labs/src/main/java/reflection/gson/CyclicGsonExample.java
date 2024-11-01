@@ -1,6 +1,9 @@
 package reflection.gson;
 
 import com.google.gson.Gson;
+import java.util.IdentityHashMap;
+import java.util.Set;
+import java.util.Collections;
 
 class MyObject {
     MyObject ref;
@@ -24,10 +27,23 @@ public class CyclicGsonExample {
     }
 
     public static String serializeObject(MyObject obj) {
-        // todo: fix this to handle cyclic references
-        // so that it throws a CyclicGraphException when it encounters a cyclic reference
+        // Use a set to track visited objects for cycle detection
+        Set<MyObject> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        if (detectCycle(obj, visited)) {
+            throw new CyclicGraphException();
+        }
+
+        // If no cycle is detected, proceed with serialization
         Gson gson = new Gson();
         return gson.toJson(obj);
+    }
+
+    private static boolean detectCycle(MyObject obj, Set<MyObject> visited) {
+        if (obj == null) return false;
+        if (!visited.add(obj)) {
+            return true; // Cycle detected
+        }
+        return detectCycle(obj.ref, visited); // Recursive check on referenced objects
     }
 
     public static void main(String[] args) {

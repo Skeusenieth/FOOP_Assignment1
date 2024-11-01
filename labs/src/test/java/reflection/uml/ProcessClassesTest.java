@@ -33,6 +33,12 @@ class TestRegularClass extends TestAbstractClass implements TestInterface {
 class TestDependencyClass {
 }
 
+class DependencyParamClass {
+    public TestDependencyClass someMethod(TestDependencyClass dependency) {
+        return dependency;
+    }
+}
+
 
 public class ProcessClassesTest {
 
@@ -145,4 +151,17 @@ public class ProcessClassesTest {
         assertEquals(5, diagramData.classes().size(), "Expected 3 classes in DiagramData.");
         assertEquals(3, diagramData.links().size(), "Expected 3 links in DiagramData (2 superclasses and 1 dependency).");
     }
+
+    @Test
+    public void testMethodParameterDependencies() {
+        ProcessClasses processor = new ProcessClasses();
+        List<Class<?>> classList = Arrays.asList(TestDependencyClass.class, DependencyParamClass.class);
+
+        List<Link> dependencies = processor.getMethodDependencies(DependencyParamClass.class, classList);
+
+        assertEquals(1, dependencies.size(), "Expected DependencyParamClass to have 1 method parameter dependency.");
+        assertTrue(dependencies.contains(new Link("DependencyParamClass", "TestDependencyClass", LinkType.DEPENDENCY)),
+                "Expected dependency on TestDependencyClass from method parameter.");
+    }
 }
+

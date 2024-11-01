@@ -4,15 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javapy.RecordTypeAdapterFactory;
 
-import java.util.List;
-
 public class HelloGsonRecord {
 
-    // todo: modify this to support reading records using a GsonBuilder
-    static Gson gson = new Gson();
+    // Initialize Gson with support for records using a GsonBuilder and RecordTypeAdapterFactory
+    static Gson gson = new GsonBuilder()
+            .registerTypeAdapterFactory(new RecordTypeAdapterFactory())
+            .create();
 
     public record QMPerson(String firstnames, String surname,
-                    String email, int personId, boolean isCurrent) {
+                           String email, int personId, boolean isCurrent) {
     }
 
     public static String toJsonString(QMPerson person) {
@@ -20,24 +20,26 @@ public class HelloGsonRecord {
     }
 
     public static QMPerson fromJsonString(String json) {
-        // todo: return a QMPerson object from the json string
-        return null;
+        // Deserialize JSON string back into QMPerson record
+        return gson.fromJson(json, QMPerson.class);
     }
-
 
     public static void main(String[] args) {
-        // declare a record class
-        // create an instance of the record class
+        // Create an instance of the QMPerson record
         QMPerson person = new QMPerson("Jane", "Doe",
                 "jane.doe@qmul.ac.uk", 12345, true);
-        // convert the record instance to a JSON string
-        String json = gson.toJson(person);
-        // print the JSON string
-        System.out.println(json);
-        // convert the JSON string back to a record instance
+
+        // Convert the record instance to a JSON string
+        String json = toJsonString(person);
+        System.out.println("Serialized JSON: " + json);
+
+        // Convert the JSON string back to a record instance
         QMPerson personCopy = fromJsonString(json);
-        System.out.println(personCopy);
+        System.out.println("Deserialized Record:");
+        System.out.println("Firstnames: " + personCopy.firstnames());
+        System.out.println("Surname: " + personCopy.surname());
+        System.out.println("Email: " + personCopy.email());
+        System.out.println("Person ID: " + personCopy.personId());
+        System.out.println("Is Current: " + personCopy.isCurrent());
     }
 }
-
-
