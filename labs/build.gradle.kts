@@ -30,7 +30,7 @@ dependencies {
 
 
 tasks.withType<JavaExec> {
-    systemProperty("java.library.path", "/opt/miniconda3/lib/python3.12/site-packages/jep")
+    systemProperty("java.library.path", "/Users/michaelrogers/jep_venv/lib/python3.12/site-packages/jep/")
 }
 
 tasks.register<JavaExec>("ckMetrics") {
