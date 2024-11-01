@@ -7,14 +7,14 @@ This will overwrite any previous object of type T that was added.
  */
 
 public class MostRecentObject<T> {
-    private T mostRecentObject;
+    private T recentObject;
 
-    public void add(T object) {
-        mostRecentObject = object;
+    public void store(T obj) {
+        this.recentObject = obj;
     }
 
-    public T getMostRecentObject() {
-        return mostRecentObject;
+    public T get() {
+        return this.recentObject;
     }
 }
 

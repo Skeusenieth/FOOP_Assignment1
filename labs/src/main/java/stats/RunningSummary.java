@@ -3,46 +3,62 @@ package stats;
 import java.util.List;
 
 public class RunningSummary implements StatSummary {
-    // todo: might some fields be useful here?  :)
+    private int count;
+    private double sum;
+    private double sumOfSquares;
+
+    public RunningSummary() {
+        this.count = 0;
+        this.sum = 0.0;
+        this.sumOfSquares = 0.0;
+    }
 
     @Override
     public double mean() {
-        // todo: implement this
-        return 0;
+        if (count == 0) {
+            throw new NotEnoughDataException("No data to calculate mean.");
+        }
+        return sum / count;
     }
 
     @Override
     public int n() {
-        // todo: implement this
-        return 0;
+        return count;
     }
 
     @Override
     public double sum() {
-        return 0;
+        return sum;
     }
 
     @Override
     public double standardDeviation() {
-        // todo: implement this
-        return 0;
+        if (count < 2) {
+            throw new NotEnoughDataException("Not enough data to calculate standard deviation.");
+        }
+        double mean = mean();
+        double variance = (sumOfSquares - (sum * sum) / count) / (count - 1);
+        return Math.sqrt(variance);
     }
 
     @Override
     public StatSummary add(double value) {
-        // todo: implement this
-        return null;
+        count++;
+        sum += value;
+        sumOfSquares += value * value;
+        return this;
     }
 
     @Override
     public StatSummary add(Number value) {
-        // todo: implement this
-        return this.add(value.doubleValue());
+        return add(value.doubleValue());
     }
 
     @Override
     public StatSummary add(List<? extends Number> values) {
-        // todo: implement this
-        return null;
+        for (Number value : values) {
+            add(value.doubleValue());
+        }
+        return this;
     }
 }

@@ -1,6 +1,5 @@
 package lists;
 
-
 import java.util.Iterator;
 
 public class OddRange implements Iterable<Integer> {
@@ -19,29 +18,30 @@ public class OddRange implements Iterable<Integer> {
 
     private static class OddRangeIterator implements Iterator<Integer> {
         private int current;
-        private int end;
+        private final int end;
 
         public OddRangeIterator(int start, int end) {
-            // todo: implement this properly
+            this.current = (start % 2 == 0) ? start + 1 : start;
+            this.end = end;
         }
 
         @Override
         public boolean hasNext() {
-            // implement this properly
-            return false;
+            return current < end;
         }
 
         @Override
         public Integer next() {
-            // implement this properly
-            return 0;
+            int temp = current;
+            current += 2;
+            return temp;
         }
     }
 
     public static void main(String[] args) {
         OddRange range = new OddRange(0, 10);
         for (int num : range) {
-            System.out.println(num);
+            System.out.println(num); // Expected output: 1, 3, 5, 7, 9
         }
     }
 }
