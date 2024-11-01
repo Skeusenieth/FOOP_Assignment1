@@ -1,19 +1,11 @@
 package lists;
 
-public class IntLinkedList implements IntList {
-    private IntNode head;
-    private IntNode tail;
+public class EfficientIntLinkedList implements IntList {
+    private EfficientIntNode head;
+    private EfficientIntNode tail;
     private int len;
 
-    public IntNode getHead() {
-        return head;
-    }
-
-    public IntNode getTail() {
-        return tail;
-    }
-
-    public IntLinkedList() {
+    public EfficientIntLinkedList() {
         head = null;
         tail = null;
         len = 0;
@@ -21,7 +13,7 @@ public class IntLinkedList implements IntList {
 
     @Override
     public boolean contains(int value) {
-        IntNode current = head;
+        EfficientIntNode current = head;
         while (current != null) {
             if (current.value == value) {
                 return true;
@@ -33,7 +25,7 @@ public class IntLinkedList implements IntList {
 
     @Override
     public void append(int value) {
-        IntNode newNode = new IntNode(value);
+        EfficientIntNode newNode = new EfficientIntNode(value);
         if (head == null) {
             head = newNode;
             tail = newNode;
@@ -50,7 +42,7 @@ public class IntLinkedList implements IntList {
     }
 
     public static void main(String[] args) {
-        IntLinkedList list = new IntLinkedList();
+        EfficientIntLinkedList list = new EfficientIntLinkedList();
         list.append(1);
         list.append(2);
         list.append(3);
@@ -61,11 +53,11 @@ public class IntLinkedList implements IntList {
 }
 
 // A node class representing each element in the linked list
-class IntNode {
+class EfficientIntNode {
     int value;
-    IntNode next;
+    EfficientIntNode next;
 
-    public IntNode(int value) {
+    public EfficientIntNode(int value) {
         this.value = value;
         this.next = null;
     }

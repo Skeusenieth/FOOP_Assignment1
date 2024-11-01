@@ -16,14 +16,14 @@ public class PrintIntListBadly {
 
     public static void printListBadly(IntList list) {
         if (list instanceof IntLinkedList linkedList) {
-            IntNode current = linkedList.head;
+            IntNode current = linkedList.getHead();
             while (current != null) {
                 System.out.println(current.value);
                 current = current.next;
             }
         } else if (list instanceof IntArrayList arrayList) {
-            for (int i = 0; i < arrayList.len; i++) {
-                System.out.println(arrayList.values[i]);
+            for (int i = 0; i < arrayList.getLength(); i++) {
+                System.out.println(arrayList.getValues()[i]);
             }
         } else {
             throw new IllegalArgumentException(
