@@ -10,7 +10,7 @@ import java.util.List;
 public class PerformanceEvaluator {
 
     // Configuration - adjust here for different list sizes and enable/disable tests
-    private static final int[] TEST_SIZES = {10, 100, 1000, 10000};
+    private static final int[] TEST_SIZES = {10, 100, 1000, 10000, 100000};
     private static final int NUM_TRIALS = 10; // Number of trials for median calculation
     private static final boolean TEST_IntArrayList = true;
     private static final boolean TEST_IntLinkedList = true;
