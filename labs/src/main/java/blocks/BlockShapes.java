@@ -50,12 +50,23 @@ public class BlockShapes {
         Shape shape;
         // top left of piece
         int px, py; // pixel location
+        int originalPx, originalPy;
         SpriteState state = SpriteState.IN_PALETTE;
+        boolean hasOriginalPosition;
 
         public Sprite(Shape shape, int px, int py) {
             this.shape = shape;
             this.px = px;
             this.py = py;
+            this.hasOriginalPosition = false;
+        }
+
+        public void setOriginalPosition() {
+            if (!hasOriginalPosition) {
+                this.originalPx = this.px;
+                this.originalPy = this.py;
+                this.hasOriginalPosition = true; // Mark as set
+            }
         }
 
         // check if a point is within the sprite

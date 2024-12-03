@@ -1,32 +1,26 @@
 package blocks;
 
-import blocks.BlockShapes.Piece;
-import blocks.BlockShapes.Shape;
-import blocks.BlockShapes.Cell;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import blocks.BlockShapes.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ModelSet extends StateSet implements ModelInterface {
+    Set<Cell> locations = new HashSet<>(); // All valid grid locations.
+    List<Shape> regions = new RegionHelper().allRegions(); // Predefined regions for validation.
 
-    Set<Cell> locations = new HashSet<>();
-    List<Shape> regions = new RegionHelper().allRegions();
-
-    // we need a constructor to initialise the regions
+    // Constructor initializes the regions.
     public ModelSet() {
         super();
-        initialiseLocations();
+        initialiseLocations(); // Initialize all valid grid locations.
     }
-    // method implementations below ...
 
+    @Override
     public int getScore() {
-        return score;
+        return score; // Returns the current score.
     }
 
     private void initialiseLocations() {
-        // having all grid locations in a set is in line with the set based approach
+        // Populate the `locations` set with all valid grid cells.
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 locations.add(new Cell(i, j));
@@ -36,69 +30,66 @@ public class ModelSet extends StateSet implements ModelInterface {
 
     @Override
     public boolean canPlace(Piece piece) {
-        // can be placed if the cells are not occupied i.e. not in the occupiedCells set
-        // though each one must be within the bounds of the grid
-        // use a stream to check if all the cells are not occupied
-
-        // todo: implement
-        return false;
+        // Checks if all cells in the piece are within bounds (`locations`) and not already occupied.
+        return piece.cells().stream()
+                .allMatch(cell -> locations.contains(cell) && !occupiedCells.contains(cell));
     }
 
     @Override
     public void place(Piece piece) {
-        // todo: implement
-        // add the cells in the Piece to the occupiedCells set
-        // then remove all the poppable regions
-        // increment the score as function of the regions popped
+        // Places the piece if it is valid and updates the occupied cells.
+        if (!canPlace(piece)) {
+            throw new IllegalArgumentException("Piece cannot be placed.");
+        }
+
+        occupiedCells.addAll(piece.cells()); // Mark all piece cells as occupied.
+
+        // Check for complete regions and remove them.
+        for (Shape region : regions) {
+            if (isComplete(region)) {
+                remove(region); // Clear the region.
+                score += region.size(); // Increment score based on region size.
+            }
+        }
     }
 
     @Override
     public void remove(Shape region) {
-        // todo: implement
-        // remove the cells from the occupiedCells set
+        // Removes the cells of the given region from the `occupiedCells` set.
+        occupiedCells.removeAll(region);
     }
 
     @Override
     public boolean isComplete(Shape region) {
-        // todo: implement
-        // use a stream to check if all the cells in the region are occupied
-        return false;
+        // Checks if all cells in the region are occupied.
+        return region.stream().allMatch(occupiedCells::contains);
     }
 
     @Override
     public boolean isGameOver(List<Shape> palettePieces) {
-        // todo: implement
-        // if any shape in the palette can be placed, the game is not over
-        // use a helper function to check whether an indiviual shape can be placed anywhere
-        // and
-        return false;
+        // Determines if the game is over by checking if any palette piece can be placed.
+        return palettePieces.stream().noneMatch(this::canPlaceAnywhere);
     }
 
     public boolean canPlaceAnywhere(Shape shape) {
-        // todo: implement
-
-        // check if the shape can be placed anywhere on the grid
-        // by checking if it can be placed at any loc
-        return false;
+        // Checks if the shape can be placed anywhere on the grid.
+        return locations.stream().anyMatch(loc -> canPlace(new Piece(shape, loc)));
     }
 
     @Override
     public List<Shape> getPoppableRegions(Piece piece) {
-        // todo: implement
+        // Identifies regions that would be cleared if the piece is placed.
+        Set<Cell> simulatedOccupied = new HashSet<>(occupiedCells);
+        simulatedOccupied.addAll(piece.cells()); // Simulate adding the piece.
 
-        // return the regions that would be popped if the piece is placed
-        // to do this we need to iterate over the regions and check if the piece overlaps enough to complete it
-        // i.e. we can make a new set of occupied cells and check if the region is complete
-        // if it is complete, we add it to the list of regions to be popped
-
-
-        return new ArrayList<>();
-
+        return regions.stream()
+                .filter(region -> region.stream().allMatch(simulatedOccupied::contains)) // Check completeness.
+                .collect(Collectors.toList()); // Collect all poppable regions.
     }
 
     @Override
     public Set<Cell> getOccupiedCells() {
-        // todo: implement
-        return new HashSet<>();
+        // Returns the set of currently occupied cells.
+        return new HashSet<>(occupiedCells);
     }
 }
