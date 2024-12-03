@@ -38,21 +38,24 @@ public class Model2dArray extends State2dArray implements ModelInterface {
 
     @Override
     public void place(Piece piece) {
-        // Places the piece on the grid and checks for complete regions to clear.
-        if (!canPlace(piece)) {
-            throw new IllegalArgumentException("Piece cannot be placed.");
-        }
-
+        // Mark cells as occupied.
         for (Cell cell : piece.cells()) {
-            grid[cell.x()][cell.y()] = true; // Mark cells as occupied.
+            grid[cell.x()][cell.y()] = true;
         }
 
-        // Check for complete regions and update the score.
+        // Collect all complete regions.
+        List<Shape> regionsToRemove = new ArrayList<>();
         for (Shape region : regions) {
             if (isComplete(region)) {
-                remove(region); // Clear the region.
-                score += region.size(); // Increase the score based on region size.
+                regionsToRemove.add(region);
             }
+        }
+
+        // Remove all complete regions and update the score.
+        for (Shape region : regionsToRemove) {
+            remove(region); // Clear the region.
+            System.out.println("im running");
+            score += region.size(); // Increment the score based on region size.
         }
     }
 
@@ -138,3 +141,4 @@ public class Model2dArray extends State2dArray implements ModelInterface {
         return true;
     }
 }
+// Refactored and improved for OOP principles

@@ -9,12 +9,12 @@ import blocks.BlockShapes.*;
 import blocks.BlockShapes.Shape;
 
 public class GameView extends JComponent {
-    ModelInterface model;
-    Palette palette;
-    int margin = 5;
-    int shapeRegionHeight;
-    int cellSize = 40;
-    int paletteCellSize = 20;
+    final ModelInterface model;
+    final Palette palette;
+    final int margin = 5;
+    final int shapeRegionHeight;
+    int cellSize;
+    int paletteCellSize;
     int shrinkSize = 30;
     Piece ghostShape = null;
     List<Shape> poppableRegions = null;

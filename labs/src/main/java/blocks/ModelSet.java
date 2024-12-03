@@ -5,8 +5,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ModelSet extends StateSet implements ModelInterface {
-    Set<Cell> locations = new HashSet<>(); // All valid grid locations.
-    List<Shape> regions = new RegionHelper().allRegions(); // Predefined regions for validation.
+    final Set<Cell> locations = new HashSet<>(); // All valid grid locations.
+    final List<Shape> regions = new RegionHelper().allRegions(); // Predefined regions for validation.
 
     // Constructor initializes the regions.
     public ModelSet() {
@@ -37,26 +37,41 @@ public class ModelSet extends StateSet implements ModelInterface {
 
     @Override
     public void place(Piece piece) {
-        // Places the piece if it is valid and updates the occupied cells.
-        if (!canPlace(piece)) {
-            throw new IllegalArgumentException("Piece cannot be placed.");
-        }
+        // Mark all piece cells as occupied.
+        occupiedCells.addAll(piece.cells());
 
-        occupiedCells.addAll(piece.cells()); // Mark all piece cells as occupied.
-
-        // Check for complete regions and remove them.
+        // Collect all complete regions.
+        List<Shape> regionsToRemove = new ArrayList<>();
         for (Shape region : regions) {
             if (isComplete(region)) {
-                remove(region); // Clear the region.
-                score += region.size(); // Increment score based on region size.
+                regionsToRemove.add(region);
             }
         }
+
+        // Apply a multiplier based on the number of regions.
+        int multiplier = Math.max(1, regionsToRemove.size()); // Ensure multiplier is at least 1.
+        int pointsEarned = 0;
+
+        // Remove all complete regions and calculate points.
+        for (Shape region : regionsToRemove) {
+            remove(region); // Clear the region.
+            pointsEarned += region.size(); // Calculate points for this region.
+        }
+
+        // Apply the multiplier to the points earned.
+        pointsEarned *= multiplier;
+        score += pointsEarned; // Update the total score.
+
+        // Optionally: Log the multiplier and points earned for debugging.
+        System.out.println("Regions Popped: " + regionsToRemove.size() +
+                ", Multiplier: " + multiplier +
+                ", Points Earned: " + pointsEarned);
     }
 
     @Override
     public void remove(Shape region) {
         // Removes the cells of the given region from the `occupiedCells` set.
-        occupiedCells.removeAll(region);
+        region.forEach(occupiedCells::remove);
     }
 
     @Override
@@ -93,3 +108,4 @@ public class ModelSet extends StateSet implements ModelInterface {
         return new HashSet<>(occupiedCells);
     }
 }
+// Refactored and improved for OOP principles

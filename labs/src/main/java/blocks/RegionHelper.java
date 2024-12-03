@@ -1,19 +1,18 @@
 package blocks;
 
 import blocks.BlockShapes.Shape;
-import blocks.BlockShapes.Piece;
 import blocks.BlockShapes.Cell;
 
 
 import java.util.ArrayList;
 
 public class RegionHelper {
-    int width = ModelInterface.width;
-    int height = ModelInterface.height;
-    int subSize = ModelInterface.subSize;
-    int nRows = height;
-    int nCols = width;
-    int nSubRows = height / subSize;
+    final int width = ModelInterface.width;
+    final int height = ModelInterface.height;
+    final int subSize = ModelInterface.subSize;
+    final int nRows = height;
+    final int nCols = width;
+    final int nSubRows = height / subSize;
 
     Shape rowShape(int row) {
         Shape shape = new Shape();

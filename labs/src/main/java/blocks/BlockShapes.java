@@ -42,12 +42,31 @@ public class BlockShapes {
     }
 
     public enum SpriteState {
-        IN_PLAY, IN_PALETTE, PLACED,
-    }
+        IN_PLAY {
+            @Override
+            public void handleState(Sprite sprite) {
+                System.out.println("Sprite is in play.");
+            }
+        },
+        IN_PALETTE {
+            @Override
+            public void handleState(Sprite sprite) {
+                sprite.returnToOriginalPosition();
+                System.out.println("Sprite returned to palette.");
+            }
+        },
+        PLACED {
+            @Override
+            public void handleState(Sprite sprite) {
+                System.out.println("Sprite has been placed.");
+            }
+        };
 
+        public abstract void handleState(Sprite sprite);
+    }
     public static class Sprite {
         // models a Shape located at a place in pixel coords with
-        Shape shape;
+        final Shape shape;
         // top left of piece
         int px, py; // pixel location
         int originalPx, originalPy;
@@ -61,6 +80,15 @@ public class BlockShapes {
             this.hasOriginalPosition = false;
         }
 
+        public void setState(SpriteState state) {
+            this.state = state;
+            this.state.handleState(this);
+        }
+
+        public SpriteState getState() {
+            return state;
+        }
+
         public void setOriginalPosition() {
             if (!hasOriginalPosition) {
                 this.originalPx = this.px;
@@ -68,6 +96,12 @@ public class BlockShapes {
                 this.hasOriginalPosition = true; // Mark as set
             }
         }
+
+        public void moveTo(PixelLoc loc){
+            this.px = loc.x();
+            this.py = loc.y();
+        }
+
 
         // check if a point is within the sprite
         public boolean contains(PixelLoc point, int cellSize) {
@@ -95,12 +129,17 @@ public class BlockShapes {
         public String toString() {
             return "Sprite: " + state + " " + shape + " at " + px + ", " + py;
         }
+
+        public void returnToOriginalPosition() {
+            this.px = this.originalPx;
+            this.py = this.originalPy;
+        }
     }
 
 
     public static class ShapeSet {
         // a good-enough set of 'Blockonimo' shapes
-        ArrayList<Shape> shapeTypes = new ArrayList<>(List.of(
+        final ArrayList<Shape> shapeTypes = new ArrayList<>(List.of(
                 new Shape(List.of(new Cell(0, 0), new Cell(1, 0), new Cell(2, 0))),
                 new Shape(List.of(new Cell(0, 0), new Cell(1, 0), new Cell(0, 1))),
                 new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1))),
@@ -112,7 +151,12 @@ public class BlockShapes {
                 new Shape(List.of(new Cell(0, 0), new Cell(1, 0), new Cell(1, 1), new Cell(2, 0))),
                 new Shape(List.of(new Cell(0, 0), new Cell(1, 0), new Cell(2, 0), new Cell(3, 0))),
                 new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(0, 2), new Cell(0, 3))),
-                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(0, 2)))
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(0, 2))),
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 0))),
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1))),
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2))),
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2), new Cell(2, 2))),
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2), new Cell(2, 1)))
         ));
 
         public ArrayList<Shape> getShapes() {

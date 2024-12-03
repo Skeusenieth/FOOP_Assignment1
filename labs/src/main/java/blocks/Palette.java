@@ -7,9 +7,9 @@ import java.util.Random;
 import blocks.BlockShapes.*;
 
 public class Palette {
-    ArrayList<Shape> shapes = new ArrayList<>(); // All possible shapes.
-    List<Sprite> sprites; // Currently available sprites in the palette.
-    int nShapes = 3; // Number of sprites to display in the palette.
+    final ArrayList<Shape> shapes = new ArrayList<>(); // All possible shapes.
+    final List<Sprite> sprites; // Currently available sprites in the palette.
+    final int nShapes = 3; // Number of sprites to display in the palette.
 
     public Palette() {
         shapes.addAll(new ShapeSet().getShapes()); // Populate shapes from ShapeSet.
@@ -46,6 +46,10 @@ public class Palette {
         return null; // Return null if no sprite matches.
     }
 
+    public void removeSprite(Sprite sprite) {
+        sprites.remove(sprite); // Remove the sprite from the palette.
+    }
+
     private int nReadyPieces() {
         // Counts the number of sprites in IN_PALETTE or IN_PLAY states.
         int count = 0;
@@ -59,7 +63,6 @@ public class Palette {
     }
 
     public void doLayout(int x0, int y0, int cellSize) {
-        int spacing = cellSize; // Define spacing between sprites.
         int x = x0;
         int y = y0;
 
@@ -70,14 +73,27 @@ public class Palette {
             sprite.setOriginalPosition();
 
             // Adjust x for the next sprite, wrapping to the next row if needed.
-            x += (sprite.shape.size() + 1) * cellSize + spacing;
+            x += (sprite.shape.size() + 1) * cellSize + cellSize;
 
             if (x + cellSize > ModelInterface.width * cellSize) {
                 x = x0; // Reset to the first column.
-                y += cellSize + spacing; // Move to the next row.
+                y += cellSize + cellSize; // Move to the next row.
             }
         }
     }
+
+    public boolean handleValidSpritePlacement(Sprite sprite, int x0, int y0, int cellSize) {
+        removeSprite(sprite); // Remove the placed sprite.
+
+        // Replenish if necessary and re-layout sprites.
+        if (replenish()) {
+            doLayout(x0, y0, cellSize);
+        }
+
+        // Return whether replenishment occurred (could be used for feedback).
+        return true;
+    }
+
 
     public boolean replenish() {
         if (nReadyPieces() > 0) {
