@@ -156,7 +156,8 @@ public class BlockShapes {
                 new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1))),
                 new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2))),
                 new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2), new Cell(2, 2))),
-                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2), new Cell(2, 1)))
+                new Shape(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(1, 1), new Cell(1, 2), new Cell(2, 1))),
+                new Shape(List.of(new Cell(0, 0)))
         ));
 
         public ArrayList<Shape> getShapes() {

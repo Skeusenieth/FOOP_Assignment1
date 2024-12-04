@@ -61,7 +61,12 @@ public class ModelSet extends StateSet implements ModelInterface {
         // Apply the multiplier to the points earned.
         pointsEarned *= multiplier;
         score += pointsEarned; // Update the total score.
-
+        if (regionsToRemove.size() > 1){
+            SoundPlayer.playSound("MultipleSectionsPopped.wav");
+        }
+        else if (!regionsToRemove.isEmpty()) {
+            SoundPlayer.playSound("SectionPopped.wav"); // Play a sound effect if points were earned.
+        }
         // Optionally: Log the multiplier and points earned for debugging.
         System.out.println("Regions Popped: " + regionsToRemove.size() +
                 ", Multiplier: " + multiplier +
@@ -77,7 +82,7 @@ public class ModelSet extends StateSet implements ModelInterface {
     @Override
     public boolean isComplete(Shape region) {
         // Checks if all cells in the region are occupied.
-        return region.stream().allMatch(occupiedCells::contains);
+        return occupiedCells.containsAll(region);
     }
 
     @Override

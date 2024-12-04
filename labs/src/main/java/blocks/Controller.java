@@ -37,6 +37,7 @@ public class Controller extends MouseAdapter {
 
         if (selectedSprite != null) {
             selectedSprite.setState(SpriteState.IN_PLAY); // Mark the sprite as being moved.
+            SoundPlayer.playSound("Pickup.wav");
             view.repaint(); // Refresh the view to reflect changes.
         }
     }
@@ -89,13 +90,17 @@ public class Controller extends MouseAdapter {
                 view.margin + ModelInterface.height * view.cellSize, view.paletteCellSize);
 
         selectedSprite.setState(SpriteState.PLACED); // Update state to indicate placement.
-
+        SoundPlayer.playSound("Drop.wav");
         // Check game-over status.
         gameOver = model.isGameOver(palette.getShapesToPlace());
+        if (gameOver) {
+            SoundPlayer.playSound("GameOver.wav");
+        }
     }
 
     private void handleInvalidPlacement() {
         selectedSprite.setState(SpriteState.IN_PALETTE); // Set state back to palette.
+        SoundPlayer.playSound("Invalid.wav");
     }
 
     private void clearSelection() {
@@ -115,22 +120,22 @@ public class Controller extends MouseAdapter {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        JFrame frame = new JFrame("Blocks");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Instantiate the logical model, palette, and game view.
-        ModelInterface model = new ModelSet(); // Can switch to ModelSet if needed.
+        // Preload all sounds
+        SoundPlayer.preloadSounds("Pickup.wav", "Drop.wav", "SectionPopped.wav", "MultipleSectionsPopped.wav",
+                "Invalid.wav", "GameOver.wav");
+
+        ModelInterface model = new ModelSet();
         Palette palette = new Palette();
         GameView view = new GameView(model, palette);
 
-        // Create and configure the controller.
         Controller controller = new Controller(view, model, palette, frame);
 
-        // Attach mouse listeners for interactions.
         view.addMouseListener(controller);
         view.addMouseMotionListener(controller);
 
-        // Set up and display the main game window.
         frame.add(view);
         frame.pack();
         frame.setVisible(true);

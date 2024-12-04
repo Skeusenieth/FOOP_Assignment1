@@ -98,7 +98,7 @@ public class GameView extends JComponent {
 
                 if (occupiedCells.contains(new Cell(x, y))) {
                     // Paint occupied cells in gray.
-                    g.setColor(Color.GRAY);
+                    g.setColor(Color.BLUE);
                 } else {
                     // Paint empty cells in white.
                     g.setColor(Color.WHITE);

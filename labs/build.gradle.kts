@@ -47,6 +47,9 @@ tasks.register<JavaExec>("ckMetrics") {
     mainClass.set("metrics.CKMetricsRunner")
 }
 
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 val ckVersion = "0.7.0"
 
@@ -91,7 +94,10 @@ tasks.check {
 sourceSets {
     main {
         java {
-            srcDirs("src/main/java")
+            srcDirs("src/main/java",)
+        }
+        resources {
+            srcDirs("src/main/resources")
         }
     }
     test {
