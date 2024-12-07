@@ -45,19 +45,48 @@ public class Controller extends MouseAdapter {
     @Override
     public void mouseDragged(MouseEvent e) {
         if (selectedSprite != null) {
-            selectedSprite.moveTo(new PixelLoc(e.getX(), e.getY()));
+            // Get the current mouse location
+            int mouseX = e.getX();
+            int mouseY = e.getY();
 
-            // Dynamically generate the ghost shape.
+            // Get the frame's size and calculate the total boundaries
+            int minX = 0;
+            int minY = 0;
+            int maxX = frame.getContentPane().getWidth(); // Full width of the window
+            int maxY = frame.getContentPane().getHeight(); // Full height of the window
+
+            // Check if the sprite is completely out of bounds
+            boolean isOutOfBounds =
+                    (mouseX < minX-10 || mouseX > maxX+10) ||
+                            (mouseY < minY-10 || mouseY > maxY+10);
+
+            if (isOutOfBounds) {
+                // Snap the sprite back to the palette and reset its state
+                selectedSprite.setState(SpriteState.IN_PALETTE);
+
+                // Clear the ghost shape and regions
+                view.ghostShape = null;
+                view.poppableRegions = null;
+
+                // Repaint the view to reflect changes
+                view.repaint();
+                return;
+            }
+
+            // Otherwise, allow dragging within bounds
+            selectedSprite.moveTo(new PixelLoc(mouseX, mouseY));
+
+            // Dynamically generate the ghost shape
             view.ghostShape = selectedSprite.snapToGrid(view.margin, view.cellSize);
 
-            // Update poppable regions based on the ghost shape.
-            if (view.ghostShape != null & model.canPlace(view.ghostShape)) {
+            // Update poppable regions based on the ghost shape
+            if (view.ghostShape != null && model.canPlace(view.ghostShape)) {
                 view.poppableRegions = model.getPoppableRegions(view.ghostShape);
             } else {
                 view.poppableRegions = null; // Clear if no ghost shape
             }
 
-            // Repaint to reflect the updated ghost shape.
+            // Repaint to reflect the updated ghost shape
             view.repaint();
         }
     }

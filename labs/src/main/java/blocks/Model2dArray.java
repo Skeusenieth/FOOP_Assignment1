@@ -22,18 +22,28 @@ public class Model2dArray extends State2dArray implements ModelInterface {
 
     @Override
     public int getScore() {
+        System.out.println("Current Score: " + score);
         return score; // Returns the current game score.
     }
 
     @Override
     public boolean canPlace(Piece piece) {
-        // Validates whether the piece can be placed without overlap or going out of bounds.
         for (Cell cell : piece.cells()) {
-            if (cell.x() < 0 || cell.x() >= width || cell.y() < 0 || cell.y() >= height || grid[cell.x()][cell.y()]) {
-                return false; // Invalid placement if out of bounds or overlaps occupied cells.
+            if (isOutOfBounds(cell) || isOccupied(cell)) {
+                return false;
             }
         }
         return true;
+    }
+
+    // Check if a cell is out of bounds
+    private boolean isOutOfBounds(Cell cell) {
+        return cell.x() < 0 || cell.x() >= width || cell.y() < 0 || cell.y() >= height;
+    }
+
+    // Check if a cell is already occupied
+    private boolean isOccupied(Cell cell) {
+        return grid[cell.x()][cell.y()];
     }
 
     @Override
@@ -51,12 +61,27 @@ public class Model2dArray extends State2dArray implements ModelInterface {
             }
         }
 
-        // Remove all complete regions and update the score.
+        // Apply a multiplier based on the number of regions.
+        int multiplier = Math.max(1, regionsToRemove.size()); // Ensure multiplier is at least 1.
+        int pointsEarned = 0;
+
+        // Remove all complete regions and calculate points.
         for (Shape region : regionsToRemove) {
             remove(region); // Clear the region.
-            System.out.println("im running");
-            score += region.size(); // Increment the score based on region size.
+            pointsEarned += region.size(); // Calculate points for this region.
         }
+
+        // Apply the multiplier to the points earned.
+        pointsEarned *= multiplier;
+        score += pointsEarned; // Update the total score.
+
+        // Play sound effects for points earned.
+        playSoundEffect(regionsToRemove);
+
+        // Optionally log placement details for debugging.
+        System.out.println("Regions Popped: " + regionsToRemove.size() +
+                ", Multiplier: " + multiplier +
+                ", Points Earned: " + pointsEarned);
     }
 
     @Override
@@ -140,5 +165,13 @@ public class Model2dArray extends State2dArray implements ModelInterface {
         }
         return true;
     }
+
+    // Play sound effects based on regions popped
+    private void playSoundEffect(List<Shape> regions) {
+        if (regions.size() > 1) {
+            SoundPlayer.playSound("MultipleSectionsPopped.wav");
+        } else if (!regions.isEmpty()) {
+            SoundPlayer.playSound("SectionPopped.wav");
+        }
+    }
 }
-// Refactored and improved for OOP principles

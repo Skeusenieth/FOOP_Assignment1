@@ -103,19 +103,23 @@ public class BlockShapes {
         }
 
 
-        // check if a point is within the sprite
         public boolean contains(PixelLoc point, int cellSize) {
             for (Cell cell : shape) {
-                int cx = px + cell.x() * cellSize;
-                int cy = py + cell.y() * cellSize;
-                if (cx <= point.x() &&
-                        cy <= point.y() &&
-                        cx + cellSize > point.x() &&
-                        cy + cellSize > point.y()) {
+                if (isPointInCell(point, cell, cellSize)) {
                     return true;
                 }
             }
             return false;
+        }
+
+        // Helper method to check if a point lies in a specific cell
+        private boolean isPointInCell(PixelLoc point, Cell cell, int cellSize) {
+            int cx = px + cell.x() * cellSize;
+            int cy = py + cell.y() * cellSize;
+            return cx <= point.x() &&
+                    cy <= point.y() &&
+                    cx + cellSize > point.x() &&
+                    cy + cellSize > point.y();
         }
 
         // snap the piece to the grid and return as a Piece

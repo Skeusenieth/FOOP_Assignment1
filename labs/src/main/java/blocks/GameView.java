@@ -66,7 +66,6 @@ public class GameView extends JComponent {
 
     private void paintGhostShape(Graphics g, int cellSize) {
         if (ghostShape == null) {
-            System.out.println("No ghost shape to paint.");
             return;
         }
 
@@ -76,7 +75,6 @@ public class GameView extends JComponent {
             int y = margin + cell.y() * cellSize;
             g.fillRect(x, y, cellSize, cellSize);
         }
-        System.out.println("Ghost shape painted at: " + ghostShape);
     }
 
     private void paintGrid(Graphics g) {

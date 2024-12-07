@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 public class ModelSet extends StateSet implements ModelInterface {
     final Set<Cell> locations = new HashSet<>(); // All valid grid locations.
     final List<Shape> regions = new RegionHelper().allRegions(); // Predefined regions for validation.
-
+    private int score = 0; // Tracks the score.
+    private int streak = 0; // Tracks the streak.
     // Constructor initializes the regions.
     public ModelSet() {
         super();
@@ -16,6 +17,8 @@ public class ModelSet extends StateSet implements ModelInterface {
 
     @Override
     public int getScore() {
+        System.out.println("Current Score: " + score);
+        System.out.println("Current Streak: " + streak);
         return score; // Returns the current score.
     }
 
@@ -37,40 +40,64 @@ public class ModelSet extends StateSet implements ModelInterface {
 
     @Override
     public void place(Piece piece) {
-        // Mark all piece cells as occupied.
-        occupiedCells.addAll(piece.cells());
+        markCellsAsOccupied(piece);
 
-        // Collect all complete regions.
-        List<Shape> regionsToRemove = new ArrayList<>();
+        List<Shape> completeRegions = collectCompleteRegions();
+        int pointsEarned = calculatePoints(completeRegions);
+
+        pointsEarned *= streak + 1; // Apply streak multiplier.
+        score += pointsEarned; // Update the total score.
+
+        if (!completeRegions.isEmpty()) {
+            streak++; // Increase streak if regions were popped.
+        } else {
+            streak = 0; // Reset streak if no regions were popped.
+        }
+
+        playSoundEffect(completeRegions);
+        logPlacementDetails(completeRegions, pointsEarned);
+    }
+
+    // Mark all piece cells as occupied
+    private void markCellsAsOccupied(Piece piece) {
+        occupiedCells.addAll(piece.cells());
+    }
+
+    // Collect all regions that are complete
+    private List<Shape> collectCompleteRegions() {
+        List<Shape> completeRegions = new ArrayList<>();
         for (Shape region : regions) {
             if (isComplete(region)) {
-                regionsToRemove.add(region);
+                completeRegions.add(region);
             }
         }
+        return completeRegions;
+    }
 
-        // Apply a multiplier based on the number of regions.
-        int multiplier = Math.max(1, regionsToRemove.size()); // Ensure multiplier is at least 1.
-        int pointsEarned = 0;
+    // Calculate points based on the complete regions
+    private int calculatePoints(List<Shape> completeRegions) {
+        int multiplier = Math.max(1, completeRegions.size());
+        int points = 0;
 
-        // Remove all complete regions and calculate points.
-        for (Shape region : regionsToRemove) {
-            remove(region); // Clear the region.
-            pointsEarned += region.size(); // Calculate points for this region.
+        for (Shape region : completeRegions) {
+            remove(region);
+            points += region.size();
         }
+        return points * multiplier;
+    }
 
-        // Apply the multiplier to the points earned.
-        pointsEarned *= multiplier;
-        score += pointsEarned; // Update the total score.
-        if (regionsToRemove.size() > 1){
+    // Play sound effect based on regions popped
+    private void playSoundEffect(List<Shape> regions) {
+        if (regions.size() > 1) {
             SoundPlayer.playSound("MultipleSectionsPopped.wav");
+        } else if (!regions.isEmpty()) {
+            SoundPlayer.playSound("SectionPopped.wav");
         }
-        else if (!regionsToRemove.isEmpty()) {
-            SoundPlayer.playSound("SectionPopped.wav"); // Play a sound effect if points were earned.
-        }
-        // Optionally: Log the multiplier and points earned for debugging.
-        System.out.println("Regions Popped: " + regionsToRemove.size() +
-                ", Multiplier: " + multiplier +
-                ", Points Earned: " + pointsEarned);
+    }
+
+    // Log placement details for debugging
+    private void logPlacementDetails(List<Shape> regions, int pointsEarned) {
+
     }
 
     @Override
